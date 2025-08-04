@@ -1,81 +1,84 @@
 package br;
-import java.util.GregorianCalendar;
-import java.util.Scanner;
 
+import java.util.*;
 
 public class Main {
-
   public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in);
 
-    // Criando as duas contas
-    Conta c1 = new Conta("LinceNegra", 123, 100);
-    Conta c2 = new Conta("Shiriu", 669, 10);
+    // Criar contas e armazenar no Map
+    Map<Integer, Conta> contas = new HashMap<>();
+    contas.put(123, new Conta("Shiriu", 123, 1000));
+    contas.put(456, new Conta("LinceNegra", 456, 500));
 
-    int opcao;
-    do {
-      System.out.println("\n--- Menu ---");
-      System.out.println("1 - Depositar");
-      System.out.println("2 - Sacar");
-      System.out.println("3 - Transferir");
-      System.out.println("4 - Pagar");
-      System.out.println("5 - Sair");
-      System.out.print("Escolha uma opção: ");
-      opcao = sc.nextInt();
+    while (true) {
+      System.out.print("\nDigite o número da sua conta (ou 0 para sair): ");
+      int numeroConta = scanner.nextInt();
 
-      switch (opcao) {
-        case 1:
-          System.out.print("Valor para depósito: R$ ");
-          double valorDep = sc.nextDouble();
-          if (c1.depositar(valorDep)) {
-            System.out.println("Depósito realizado com sucesso.");
-          } else {
-            System.out.println("Valor inválido para depósito.");
-          }
-          break;
+      if (numeroConta == 0) break;
 
-        case 2:
-          System.out.print("Valor para saque: R$ ");
-          double valorSaq = sc.nextDouble();
-          if (c1.sacar(valorSaq)) {
-            System.out.println("Saque realizado com sucesso.");
-          } else {
-            System.out.println("Saque não realizado. Verifique saldo ou valor.");
-          }
-          break;
-
-        case 3:
-          System.out.print("Valor para transferência: R$ ");
-          double valorTransf = sc.nextDouble();
-          if (c1.transferir(c2, valorTransf)) {
-            System.out.println("Transferência realizada para " + c2.getTitular());
-          } else {
-            System.out.println("Transferência falhou. Verifique saldo.");
-          }
-          break;
-
-        case 4:
-          System.out.print("Valor do pagamento: R$ ");
-          double valorPag = sc.nextDouble();
-          if (c1.pagar(valorPag)) {
-            System.out.println("Pagamento realizado com sucesso.");
-          } else {
-            System.out.println("Pagamento falhou. Verifique saldo.");
-          }
-          break;
-
-        case 5:
-          System.out.println("Encerrando...");
-          break;
-
-        default:
-          System.out.println("Opção inválida!");
+      Conta contaAtual = contas.get(numeroConta);
+      if (contaAtual == null) {
+        System.out.println("Conta não encontrada.");
+        continue;
       }
 
-      System.out.printf("Saldo atual: R$ %.2f%n", c1.getSaldo());
+      int opcao;
+      do {
+        System.out.println("\nBem-vindo, " + contaAtual.getTitular());
+        System.out.println("1 - Depositar");
+        System.out.println("2 - Sacar");
+        System.out.println("3 - Transferir");
+        System.out.println("4 - Pagar");
+        System.out.println("5 - Trocar de conta");
+        System.out.print("Escolha uma opção: ");
+        opcao = scanner.nextInt();
 
-    } while (opcao != 5);
+        switch (opcao) {
+          case 1:
+            System.out.print("Valor para depósito: R$ ");
+            double valorDep = scanner.nextDouble();
+            contaAtual.depositar(valorDep);
+            break;
 
-    sc.close();
+          case 2:
+            System.out.print("Valor para saque: R$ ");
+            double valorSaq = scanner.nextDouble();
+            contaAtual.sacar(valorSaq);
+            break;
+
+          case 3:
+            System.out.print("Número da conta destino: ");
+            int numDestino = scanner.nextInt();
+            Conta destino = contas.get(numDestino);
+            if (destino == null) {
+              System.out.println("Conta de destino não encontrada.");
+              break;
+            }
+            System.out.print("Valor para transferir: R$ ");
+            double valorTransf = scanner.nextDouble();
+            contaAtual.transferir(destino, valorTransf);
+            break;
+
+          case 4:
+            System.out.print("Valor do pagamento: R$ ");
+            double valorPag = scanner.nextDouble();
+            contaAtual.pagar(valorPag);
+            break;
+
+          case 5:
+            System.out.println("Trocando de conta...");
+            break;
+
+          default:
+            System.out.println("Opção inválida!");
+        }
+
+        System.out.printf("Saldo atual: R$ %.2f%n", contaAtual.getSaldo());
+
+      } while (opcao != 5);
+    }
+
+    scanner.close();
   }
 }
